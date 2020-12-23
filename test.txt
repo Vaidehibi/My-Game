@@ -1,0 +1,465 @@
+
+function setup(){
+  var button1= createSprite(300,200,40,10);
+var button2= createSprite(200, 150, 10, 40);
+button2.visible= false;
+var button3= createSprite(50,50,50,10);
+button3.visible= false;
+var gameState= "Level1";
+var tree1= createSprite(200,100,30, 50);
+tree1.visible= false;
+var tree2= createSprite(350, 300, 30, 50);
+tree2.visible= false;
+
+var computerScore = 0;
+var playerScore = 0;
+var Levels = "serve";
+
+
+
+//ponggame
+var userPaddle = createSprite(390,200,10,70);
+userPaddle.visible= false;
+
+var computerPaddle = createSprite(10,200,10,70);
+computerPaddle.visible= false;
+
+var ball = createSprite(200,200,12,12);
+ball.visible= false;
+var edges= createEdgesSprites;
+}
+
+function draw() {
+  background("lightGreen");
+  
+  if(mousePressedOver(button1)){
+    gameState= "Level2";
+  }
+  
+  if(gameState=== "Level2"){
+    background("white");
+    button1.visible= false;
+    tree1. visible= true;
+    tree2. visible= true;
+    
+    if(mousePressedOver(tree1)){
+      gameState= "Level3";
+    
+    }
+  }
+  if(gameState=== "Level3"){
+    background("green");
+    button2.visible= true;
+    tree1.visible= false;
+    tree2.visible= false;
+    if(mousePressedOver(button2)){
+      gameState= "ponggame";
+    }
+    
+  if(gameState=== "ponggame"){
+    background("lightPurple");
+    button3.visible= true;
+    button2.visible= false;
+    userPaddle.visible= true;
+    computerPaddle.visible= true;
+    ball.visible= true;
+
+    if(gameState=== "Level4"){
+      background("cyan");
+      button4.visible= true;
+      tree1.visible= false;
+      tree2.visible= false;
+      if(mousePressedOver(button2)){
+        gameState= "fruitninja";
+      }
+      if(gameState=== "fruitninja"){
+        background("Purple");
+        button4.visible= true;
+        button2.visible= false;
+        fruitGroup.visible= true;
+        enemyGroup.visible= true;
+        sword.visible= true;
+  }
+  if(gameState=== "Level5"){
+    background("red");
+    button5.visible= true;
+    tree1.visible= false;
+    tree2.visible= false;
+    if(mousePressedOver(button2)){
+      gameState= "trexgame";
+    }
+    if(gameState=== "trexgame"){
+      background("orange");
+      button5.visible= true;
+      button2.visible= false;
+      CloudsGroup.visible= true;
+      ObstaclesGroup.visible= true;
+      trex.visible= true;
+}
+    
+  
+
+  
+  //display Scores
+  text(computerScore,170,20);
+  text(playerScore, 230,20);
+  
+  //draw dotted lines
+  for (var i = 0; i < 400; i+=20) {
+     line(200,i,200,i+10);
+  }
+  
+  if (Levels === "serve") {
+    text("Press Space to Serve",150,180);
+  } 
+  
+  if (Levels === "over") {
+    text("Game Over!",170,160);
+    text("Press 'R' to Restart",150,180);
+  }
+  
+  if (keyDown("r")) {
+    Levels = "serve";
+    computerScore = 0;
+    playerScore = 0;
+  }
+  
+  
+  //give velocity to the ball when the user presses play
+  //assign random velocities later for fun
+  if (keyDown("space") && Levels == "serve") {
+    ball.velocityX = 5;
+    ball.velocityY = 5;
+    Levels = "play";
+  }
+  
+  //make the userPaddle move with the mouse
+  userPaddle.y = World.mouseY;
+  
+  
+  
+  //make the ball bounce off the user paddle
+  if(ball.isTouching(userPaddle)){
+    playSound("hit.mp3");
+    ball.x = ball.x - 5;
+    ball.velocityX = -ball.velocityX;
+  }
+  
+  //make the ball bounce off the computer paddle
+  if(ball.isTouching(computerPaddle)){
+    ball.x = ball.x + 5;
+    ball.velocityX = -ball.velocityX;
+  }
+  
+  //place the ball back in the centre if it crosses the screen
+  if(ball.x > 400 || ball.x < 0){
+    
+    if (ball.x < 0) {
+      playerScore++;
+    }
+    else {
+      computerScore++;
+    }
+      
+    ball.x = 200;
+    ball.y = 200;
+    ball.velocityX = 0;
+    ball.velocityY = 0;
+    Levels = "serve";
+    
+    if (computerScore=== 5 || playerScore === 5){
+      Levels = "over";
+    }
+  }
+  
+
+  createEdgeSprites();
+    //make the ball bounce off the top and bottom walls
+  if (ball.isTouching(topEdge) || ball.isTouching(bottomEdge)) {
+    ball.bounceOff(topEdge);
+    ball.bounceOff(bottomEdge);
+  }
+  
+  //add AI to the computer paddle so that it always hits the ball
+  computerPaddle.y = ball.y;
+  if(mousePressedOver(button3)){
+    gameState= "Level2";
+    button3.visible= false;
+    ball.visible= false;
+    computerPaddle.visible= false;
+    userPaddle.visible= false;
+  }
+  }
+  drawSprites();
+}
+//FRUIT NINJA
+var PLAY=1;
+var END=0;
+//var gameState=1;
+
+var score=0;
+var fruitGroup= createGroup();
+var enemyGroup= createGroup();
+
+
+var sword= createSprite(200,200,10,10);
+sword.setAnimation("sword");
+
+function draw() {
+ background("brown");
+ textSize(20);
+ text("score:"+score,250,30);
+ 
+ if(gameState===PLAY){
+  fruits();
+  monsters();
+   sword.y=World.mouseY;
+   sword.x=World.mouseX;
+ 
+ if(fruitGroup.isTouching(sword)){
+   fruitGroup.destroyEach();
+   score=score+2;
+   playSound("sound://category_hits/puzzle_game_button_01.mp3");
+ }
+ 
+
+ 
+ else{
+   
+  if(enemyGroup.isTouching(sword)){
+   gameState=END;
+   sword.x=200;
+   sword.y=200;
+   fruitGroup.destroyEach();
+   enemyGroup.destroyEach();
+   sword.setAnimation("GameOver");
+   fruitGroup.setVelocityXEach(0);
+   enemyGroup.setVelocityXEach(0);
+   playSound("sound://category_accent/puzzle_game_accent_b_02.mp3");
+ }
+ }
+}
+}
+
+  drawSprites();
+}
+
+ function monsters(){
+   if(World.frameCount%200===0){
+     var monster= createSprite(50,50,20,20);
+   monster.setAnimation("alien");
+   monster.y=randomNumber(100,300);
+   monster.velocityX=(7+(score/10));
+   monster.lifetime= 60;
+   enemyGroup.add(monster);
+   }
+   }
+function fruits(){
+    if(World.frameCount%100===0){
+     var position= randomNumber(1,4) ;
+    var fruit= createSprite(400,200,10,10);
+    if(position===1){
+      fruit.x=400;
+      fruit.velocityX= -(7+(score/4));
+    }
+    else{
+      if(position===2){
+        fruit.x=0;
+        fruit.velocityX= (7+(score/4));
+      }
+      if(position===3){
+        fruit.y=400;
+        fruit.x=100;
+        fruit.velocityY= -(7+(score/4));
+      }
+      if(position===4){
+        fruit.x=300;
+        fruit.y=0;
+        fruit.velocityY= (7+(score/4));
+      }
+    }
+    var rand= randomNumber(1,4);
+    fruit.setAnimation("fruit"+rand);
+    fruit.scale=0.2;
+    fruitGroup.add(fruit);
+    }
+}
+//Trex Game
+//initiate Game STATEs
+//var PLAY = 1;
+//var END = 0;
+//var gameState = PLAY;
+
+//create a trex sprite
+var trex = createSprite(200,380,20,50);
+trex.setAnimation("trex");
+
+//set collision radius for the trex
+trex.setCollider("circle",0,0,30);
+
+//scale and position the trex
+trex.scale = 0.5;
+trex.x = 50;
+
+//create a ground sprite
+var ground = createSprite(200,380,400,20);
+ground.setAnimation("ground2");
+ground.x = ground.width /2;
+
+//invisible Ground to support Trex
+var invisibleGround = createSprite(200,385,400,5);
+invisibleGround.visible = false;
+
+//create Obstacle and Cloud Groups
+var ObstaclesGroup = createGroup();
+var CloudsGroup = createGroup();
+
+//place gameOver and restart icon on the screen
+var gameOver = createSprite(200,300);
+var restart = createSprite(200,340);
+gameOver.setAnimation("gameOver");
+gameOver.scale = 0.5;
+restart.setAnimation("restart");
+restart.scale = 0.5;
+
+gameOver.visible = false;
+restart.visible = false;
+
+//set text
+textSize(18);
+textFont("Georgia");
+textStyle(BOLD);
+
+//score
+var count = 0;
+
+function draw() {
+  //set background to white
+  background("white");
+  //display score
+  text("Score: "+ count, 250, 100);
+  //console.log(gameState);
+  
+  if(gameState === PLAY){
+    //move the ground
+    ground.velocityX = -(6 + 3*count/100);
+    //scoring
+    count = count + Math.round(World.frameRate/60);
+    
+    if (count>0 && count%100 === 0){
+      playSound("checkPoint.mp3");
+    }
+    
+    if (ground.x < 0){
+      ground.x = ground.width/2;
+    }
+    
+     //jump when the space key is pressed
+    if(keyDown("space") && trex.y >= 359){
+      trex.velocityY = -12 ;
+      playSound("jump.mp3");
+    }
+  
+    //add gravity
+    trex.velocityY = trex.velocityY + 0.8;
+    
+    //spawn the clouds
+    spawnClouds();
+  
+    //spawn obstacles
+    spawnObstacles();
+    
+    //End the game when trex is touching the obstacle
+    if(ObstaclesGroup.isTouching(trex)){
+      playSound("jump.mp3");
+      gameState = END;
+      playSound("die.mp3");
+    }
+  }
+  
+  else if(gameState === END) {
+    gameOver.visible = true;
+    restart.visible = true;
+    
+    //set velcity of each game object to 0
+    ground.velocityX = 0;
+    trex.velocityY = 0;
+    ObstaclesGroup.setVelocityXEach(0);
+    CloudsGroup.setVelocityXEach(0);
+    
+    //change the trex animation
+    trex.setAnimation("trex_collided");
+    
+    //set lifetime of the game objects so that they are never destroyed
+    ObstaclesGroup.setLifetimeEach(-1);
+    CloudsGroup.setLifetimeEach(-1);
+    
+    
+  }
+  
+  if(mousePressedOver(restart)) {
+    reset();
+  }
+  
+  //console.log(trex.y);
+  
+  //stop trex from falling down
+  trex.collide(invisibleGround);
+  
+  drawSprites();
+}
+
+function reset(){
+  gameState = PLAY;
+  
+  gameOver.visible = false;
+  restart.visible = false;
+  
+  ObstaclesGroup.destroyEach();
+  CloudsGroup.destroyEach();
+  
+  trex.setAnimation("trex");
+  
+  count = 0;
+  
+}
+
+function spawnObstacles() {
+  if(World.frameCount % 60 === 0) {
+    var obstacle = createSprite(400,365,10,40);
+    obstacle.velocityX = - (6 + 3*count/100);
+    
+    //generate random obstacles
+    var rand = randomNumber(1,6);
+    obstacle.setAnimation("obstacle" + rand);
+    
+    //assign scale and lifetime to the obstacle           
+    obstacle.scale = 0.5;
+    obstacle.lifetime = 70;
+    //add each obstacle to the group
+    ObstaclesGroup.add(obstacle);
+  }
+}
+
+function spawnClouds() {
+  //write code here to spawn the clouds
+  if (World.frameCount % 60 === 0) {
+    var cloud = createSprite(400,320,40,10);
+    cloud.y = randomNumber(280,320);
+    cloud.setAnimation("cloud");
+    cloud.scale = 0.5;
+    cloud.velocityX = -3;
+    
+     //assign lifetime to the variable
+    cloud.lifetime = 134;
+    
+    //adjust the depth
+    cloud.depth = trex.depth;
+    trex.depth = trex.depth + 1;
+    
+    //add each cloud to the group
+    CloudsGroup.add(cloud);
+  }
+  
+}
+
